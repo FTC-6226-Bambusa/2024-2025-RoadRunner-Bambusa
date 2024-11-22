@@ -37,10 +37,11 @@ public class Chain_PID {
         return output + ff;
     }
 
-    public void setPID(double p, double i, double d) {
+    public void setPID(double p, double i, double d, double f) {
         this.Kp = p;
         this.Ki = i;
         this.Kd = d;
+        this.f = f;
     }
 
     public double getKp() {

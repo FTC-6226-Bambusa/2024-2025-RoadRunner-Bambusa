@@ -14,12 +14,14 @@ import org.firstinspires.ftc.teamcode.MecanumDrive;
 @Autonomous
 public class Auto extends LinearOpMode {
 
+    // Different Stages Of The Auto
     public enum Stage {
         STAGE1,
         STAGE2,
         IDLE;
     }
 
+    // Time Based Auto
     ElapsedTime timer = new ElapsedTime();
 
     Stage stage = Stage.STAGE1;
@@ -27,6 +29,7 @@ public class Auto extends LinearOpMode {
     MecanumDrive drive;
     Robot robot;
 
+    // PIDF
     private PIDController controller;
 
     public static double p = 0.01, i = 0.2, d = 0.0011;
@@ -43,15 +46,17 @@ public class Auto extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
 
+        // Declaring Robot
         robot = new Robot(hardwareMap);
         controller = new PIDController(p, i, d);
+
+
+
+        // Telemetry
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
-
-        slideChain = hardwareMap.get(DcMotorEx.class, "slideChain");
-        slideChain.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
         waitForStart();
 
+        // Stages Of Auto
         while (opModeIsActive()) {
 
             switch (stage) {
@@ -77,6 +82,7 @@ public class Auto extends LinearOpMode {
                     break;
 
                 case IDLE:
+
                     // Do Nothing :)
                     robot.drive(0, 0, 0, 0);
                     break;

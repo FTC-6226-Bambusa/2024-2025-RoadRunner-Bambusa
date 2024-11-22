@@ -10,24 +10,31 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 public class Robot {
+
+    // Drive Chain Motors
     DcMotor frontLeftMotor;
     DcMotor backLeftMotor;
     DcMotor frontRightMotor;
     DcMotor backRightMotor;
 
+    // Arm Motors
     DcMotor slideChain;
     DcMotor slideLeft;
     DcMotor slideRight;
 
+    // Initialized PIDF
     public double kP = 0;
     public double kI = 0;
     public double kD = 0;
-    PIDController pid = new PIDController(kP, kI, kD);
+    public double f = 0;
 
+    private Chain_PID pid = new Chain_PID(kP, kI, kD, f);
+
+    // Drive Speed & Boost Speed (When Pressing LT)
     public double driveSpeed = 0.5;
     public double boostSpeed = 0.8;
 
-    // Finds Value Of Point A To Point B
+    // Finds T Of The Way From Value A To Point B
     private double lerp(double a, double b, double t) {
         return a + (b - a) * t;
     }
@@ -78,15 +85,26 @@ public class Robot {
     }
 
     // Extends Robot Arm
-    public void extend(boolean dpadup, boolean dpaddown) {
-        this.slideRight.setPower(dpadup ? 1 : (dpaddown ? -1 : 0));
-        this.slideLeft.setPower(dpadup ? 1 : (dpaddown ? -1 : 0));
+    public void extend(double speed, double limit, boolean dpadup, boolean dpaddown) {
+        if (this.slideLeft.getCurrentPosition() > limit || this.slideRight.getCurrentPosition() > limit) {
+            this.slideRight.setPower(dpadup ? speed : (dpaddown ? -speed : 0));
+            this.slideLeft.setPower(dpadup ? speed : (dpaddown ? -speed : 0));
+        }
     }
 
-
     // Rotates Robot Arm To Position
-   // public void slideToPosition(boolean ifY) {
-       // PID_Arm.target = (ifY ? 230 : 30);
+    public void slideChainToPosition(double target) {
+        this.slideChain.setPower(this.pid.PIDControl(target, this.slideChain.getCurrentPosition()));
+    }
 
+    // Sets PIDF Values
+    public void setPID(double p, double i, double d, double f) {
+        this.kP = p;
+        this.kI = i;
+        this.kD = d;
+        this.f = f;
+
+        this.pid.setPID(p, i, d, f);
+    }
 
 }
